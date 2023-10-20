@@ -13,6 +13,7 @@ public class PlayerInput : MonoBehaviour
     Rigidbody _rb;
 
     GroundDetection _groundDetection;
+    Coroutine _delayedTearingEnable;
 
     bool _isAnchored;
 
@@ -45,7 +46,7 @@ public class PlayerInput : MonoBehaviour
                 {
                     Jump();
                 }
-                if (Input.GetKeyDown("s"))
+                else if (Input.GetKeyDown("s"))
                 {
                     Anchor(true);
                 }
@@ -78,7 +79,7 @@ public class PlayerInput : MonoBehaviour
                 {
                     Jump();
                 }
-                if (Input.GetKeyDown(KeyCode.DownArrow))
+                else if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
                     Anchor(true);
                 }
@@ -135,6 +136,7 @@ public class PlayerInput : MonoBehaviour
 
             _isAnchored = true;
             _rb.velocity = Vector2.zero;
+            if (_delayedTearingEnable != null) StopCoroutine(_delayedTearingEnable);
             _ropeController.EnableTearing(false);
             _ropeController.StaticDynamicSwitch(true, _playerID);
             _renderer.material.color = Color.red;
@@ -143,10 +145,17 @@ public class PlayerInput : MonoBehaviour
         else
         {
             _isAnchored = false;
-            _ropeController.EnableTearing(true);
-            _renderer.material.color = _initColor;
+            _ropeController.ResetLength();
             _ropeController.StaticDynamicSwitch(false, _playerID);
+            _delayedTearingEnable = StartCoroutine(nameof(EnableRopeTearing));
+            _renderer.material.color = _initColor;
         }
+    }
+
+    IEnumerator EnableRopeTearing()
+    {
+        yield return new WaitForSeconds(0.5f);
+        _ropeController.EnableTearing(true);
     }
 
     private void Crane(bool up)

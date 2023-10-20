@@ -5,17 +5,10 @@ using Obi;
 
 public class GroundDetection : MonoBehaviour
 {
-    [SerializeField] RopeController _ropeController;
     [SerializeField] LayerMask _floorLayer;
     [SerializeField] float _rayLength = 1.0f;
 
     public bool grounded;
-    ObiRigidbody _obiRB;
-
-    private void Awake()
-    {
-        _obiRB = GetComponentInParent<ObiRigidbody>();
-    }
 
     private void FixedUpdate()
     {
@@ -24,8 +17,6 @@ public class GroundDetection : MonoBehaviour
             if(!grounded)
             {
                 grounded = true;
-                _ropeController.ResetLength();
-                //_obiRB.kinematicForParticles = true;
             }
         }
 
@@ -34,7 +25,6 @@ public class GroundDetection : MonoBehaviour
             if (grounded)
             {
                 grounded = false;
-                //_obiRB.kinematicForParticles = false;
             }
         }
     }
