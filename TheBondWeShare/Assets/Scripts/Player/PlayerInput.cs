@@ -19,6 +19,7 @@ public class PlayerInput : MonoBehaviour
         switch (_playerID)
         {
             case 0:
+
                 if (Input.GetKey("a"))
                 {
                     _playerMovement.Move(-1);
@@ -33,11 +34,11 @@ public class PlayerInput : MonoBehaviour
                 }
                 else if (Input.GetKeyDown("s"))
                 {
-                    _playerMovement.Anchor(true, _playerID);
+                    _playerMovement.Down(true, _playerID);
                 }
                 else if (Input.GetKeyUp("s"))
                 {
-                    _playerMovement.Anchor(false, _playerID);
+                    _playerMovement.Down(false, _playerID);
                 }
                 if (Input.GetKey("q"))
                 {
@@ -66,11 +67,11 @@ public class PlayerInput : MonoBehaviour
                 }
                 else if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    _playerMovement.Anchor(true, _playerID);
+                    _playerMovement.Down(true, _playerID);
                 }
                 else if (Input.GetKeyUp(KeyCode.DownArrow))
                 {
-                    _playerMovement.Anchor(false, _playerID);
+                    _playerMovement.Down(false, _playerID);
                 }
 
                 if (Input.GetKey("o"))

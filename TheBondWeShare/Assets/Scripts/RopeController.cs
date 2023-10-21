@@ -7,6 +7,7 @@ public class RopeController : MonoBehaviour
 {
     [SerializeField] ObiParticleAttachment _startAttachment, _endAttachement;
     [SerializeField] float _minLength = 2.0f, _maxLength = 5.0f;
+    [SerializeField] bool _tearingPossible;
     ObiRopeCursor _cursor;
     ObiRope _rope;
     ObiParticleAttachment.AttachmentType _type;
@@ -74,11 +75,16 @@ public class RopeController : MonoBehaviour
 
     public void ResetLength()
     {
+        StartCoroutine(EnableTearing(false, 0));
         _cursor.ChangeLength(_maxLength);
+        StartCoroutine(EnableTearing(true, 0.2f));
     }
 
-    public void EnableTearing(bool isActive)
+    public IEnumerator EnableTearing(bool isActive, float delay)
     {
+        if (!_tearingPossible) yield break;
+
+        yield return new WaitForSeconds(delay);
        _rope.tearingEnabled = isActive;
     }
 }

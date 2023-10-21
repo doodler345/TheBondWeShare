@@ -190,6 +190,7 @@ Transform:
   - {fileID: 7655933471050827076}
   - {fileID: 8583407543967393953}
   - {fileID: 7882798335983509459}
+  - {fileID: 1656819915781012324}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5024873983000157571
@@ -217,9 +218,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88c1fdb672a45994baa5f4cfeb87d078, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  State: 0
   _ropeController: {fileID: 0}
   _playerModel: {fileID: 7655933471050827076}
   _speed: 5
+  _jumpForce: 10
+  _hangingJumpBoost: 1.5
 --- !u!54 &5134999027986046707
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -229,7 +233,7 @@ Rigidbody:
   m_GameObject: {fileID: 2612411739907244293}
   serializedVersion: 4
   m_Mass: 3
-  m_Drag: 0
+  m_Drag: 0.4
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -260,6 +264,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kinematicForParticles: 1
+--- !u!1 &5966237132803321467
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1656819915781012324}
+  - component: {fileID: 2381516778351731603}
+  m_Layer: 0
+  m_Name: LedgeDetect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1656819915781012324
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5966237132803321467}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.27799988, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7370160072750903868}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2381516778351731603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5966237132803321467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6835ee5bde64b847a7c859af80bb82e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  _rayLength: 0.25
+  _offset: {x: 0.85, y: 1, z: 0}
+  hanging: 0
 --- !u!1 &7370920281479957182
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,56 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class LedgeDetection : MonoBehaviour
+{
+    [SerializeField] LayerMask _groundLayer;
+    [SerializeField] float _rayLength = 1.0f;
+    [SerializeField] Vector3 _offset;
+    PlayerMovement _playerMovement;
+    Rigidbody _rb;
+
+    public bool hanging;
+    private bool _ignore;
+
+    private void Awake()
+    {
+        _rb = GetComponentInParent<Rigidbody>();
+        _playerMovement = GetComponentInParent<PlayerMovement>();
+    }
+
+    private void FixedUpdate()
+    {
+        if (_ignore) return;
+
+        if (_rb.velocity.y < 0 && Physics.Raycast(transform.position + _offset, Vector3.down, _rayLength, _groundLayer))
+        {
+            if (!hanging)
+            {
+                Debug.Log("3");
+                hanging = true;
+                _playerMovement.LedgeHang();
+            }
+        }
+    }
+
+    public void Turn()
+    {
+        _offset.x *= -1;
+    }
+
+    public IEnumerator IgnoreForSeconds(float seconds)
+    {
+        _ignore = true;
+        Debug.Log("1");
+        yield return new WaitForSeconds(seconds);
+        Debug.Log("2");
+        _ignore = false;
+    }
+
+
+    void OnDrawGizmos()
+    {
+        Debug.DrawRay(transform.position + _offset, Vector3.down * _rayLength, Color.yellow);
+    }
+}

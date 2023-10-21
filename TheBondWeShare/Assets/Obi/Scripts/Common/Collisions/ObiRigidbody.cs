@@ -26,6 +26,8 @@ namespace Obi{
 
         private void UpdateKinematicVelocities(float stepTime)
         {
+            /*
+
             // differentiate positions/orientations to get our own velocites for kinematic objects.
             // when calling Physics.Simulate, MovePosition/Rotation do not work correctly. Also useful for animations.
             if (unityRigidbody.isKinematic)
@@ -37,6 +39,8 @@ namespace Obi{
                 Quaternion delta = transform.rotation * Quaternion.Inverse(prevRotation);
                 unityRigidbody.angularVelocity = new Vector3(delta.x, delta.y, delta.z) * 2.0f / stepTime;
             }
+
+            */
 
             prevPosition = transform.position;
             prevRotation = transform.rotation;
