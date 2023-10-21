@@ -164,6 +164,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7370160072750903868}
   - component: {fileID: 5024873983000157571}
+  - component: {fileID: -2457779600598514567}
   - component: {fileID: 5134999027986046707}
   - component: {fileID: 2757346214734174978}
   m_Layer: 0
@@ -203,10 +204,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a3de7dda67ccb34d8ef263cc6048413, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerID: 0
+--- !u!114 &-2457779600598514567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2612411739907244293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88c1fdb672a45994baa5f4cfeb87d078, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   _ropeController: {fileID: 0}
   _playerModel: {fileID: 7655933471050827076}
-  _playerID: 0
-  _speed: 4
+  _speed: 5
 --- !u!54 &5134999027986046707
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -300,7 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4272974837b2994499e1e8809c77d955, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _floorLayer:
+  _groundLayer:
     serializedVersion: 2
     m_Bits: 64
   _rayLength: 0.25
