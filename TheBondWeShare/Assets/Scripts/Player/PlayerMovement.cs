@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     public STATE State;
     [SerializeField] RopeController _ropeController;
     [SerializeField] Transform _playerModel;
+    private Vector3 _walkVelocity;
     [SerializeField] float _speed = 0.5f;
     [SerializeField] int _jumpForce = 15;
     [SerializeField] float _hangingJumpBoost = 2;
@@ -16,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
     ObiRigidbody _obiRB;
 
     GroundDetection _groundDetection;
-    LedgeDetection _ledgeDetection;
+    WallDetection _wallDetection;
     Coroutine _delayedTearingEnable, _obiKinematicsEnable;
 
     Renderer _renderer;
@@ -30,32 +31,74 @@ public class PlayerMovement : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _obiRB = GetComponent<ObiRigidbody>();
         _groundDetection = GetComponentInChildren<GroundDetection>();
-        _ledgeDetection = GetComponentInChildren<LedgeDetection>();
+        _wallDetection = GetComponentInChildren<WallDetection>();
     }
 
-
-    public void Move(int directionX)
+    private void Update()
     {
-        if (State == STATE.ANCHOR || State == STATE.HANGING) return;
-
-        if (_rb.velocity.y < 0 && !_groundDetection.grounded)
-            State = STATE.FALL;
-        else
-            State = STATE.WALK;
-
-        transform.position += new Vector3(directionX * _speed, 0, 0) * Time.deltaTime;
-
-        if (_tmpDirection != directionX)
+        switch (State)
         {
-            Turn(directionX);
-            _tmpDirection = directionX;
+            case STATE.WALK:
+                if (_rb.velocity.y < 0)
+                    State = STATE.FALL;
+                break;
+
+            case STATE.JUMP:
+                if (_rb.velocity.y < 0)
+                {
+                    State = STATE.FALL;
+                }
+                break;
+
+            case STATE.FALL:
+                if (_groundDetection.grounded)
+                    State = STATE.IDLE;
+                break;
+
+            default: 
+                break;
         }
     }
 
-    private void Turn(int directionX)
+    public void Move(int xVelocity)
     {
-        _playerModel.LookAt(_playerModel.position + new Vector3(directionX, 0, 0));
-        _ledgeDetection.Turn();
+        if (State == STATE.ANCHOR || State == STATE.HANGING)
+        {
+            return;
+        }
+
+        if (xVelocity == 0)
+        {
+            if (!(State == STATE.JUMP || State == STATE.FALL) && _groundDetection.grounded) 
+                State = STATE.IDLE;
+            return;
+        }
+        else
+        {
+            CheckForTurn(xVelocity);
+
+            if (_wallDetection.facingWall)
+            {
+                State = STATE.IDLE;
+                return;
+            }
+
+            State = STATE.WALK;
+
+            _walkVelocity = new Vector3(xVelocity * _speed, 0, 0);
+            _rb.MovePosition(transform.position += _walkVelocity * Time.deltaTime);
+        }
+    }
+
+    private void CheckForTurn(int directionX)
+    {
+        if (_tmpDirection != directionX)
+        {
+            _playerModel.LookAt(_playerModel.position + new Vector3(directionX, 0, 0));
+            _wallDetection.Turn();
+            
+            _tmpDirection = directionX;
+        }
     }
 
     public void Jump()
@@ -64,14 +107,16 @@ public class PlayerMovement : MonoBehaviour
 
         State = STATE.JUMP;
 
-        if (_ledgeDetection.hanging)
+        if (_wallDetection.hanging)
         {
             LedgeUnhang();
             _rb.AddForce(Vector3.up * _jumpForce * _hangingJumpBoost, ForceMode.Impulse);
         }
 
-        else 
+        else
+        {
             _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
+        }
     }
 
     public void Down(bool setAnchored, int playerID)
@@ -136,8 +181,8 @@ public class PlayerMovement : MonoBehaviour
     }
     void LedgeUnhang()
     {
-        StartCoroutine(_ledgeDetection.IgnoreForSeconds(0.5f));
-        _ledgeDetection.hanging = false;
+        StartCoroutine(_wallDetection.IgnoreLedgesForSeconds(0.5f));
+        _wallDetection.hanging = false;
         
         _rb.isKinematic = false;
         _obiKinematicsEnable = StartCoroutine(EnableObiKinematics(false, 0.2f));

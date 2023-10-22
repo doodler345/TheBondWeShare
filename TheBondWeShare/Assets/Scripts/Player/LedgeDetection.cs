@@ -27,7 +27,6 @@ public class LedgeDetection : MonoBehaviour
         {
             if (!hanging)
             {
-                Debug.Log("3");
                 hanging = true;
                 _playerMovement.LedgeHang();
             }
@@ -42,9 +41,7 @@ public class LedgeDetection : MonoBehaviour
     public IEnumerator IgnoreForSeconds(float seconds)
     {
         _ignore = true;
-        Debug.Log("1");
         yield return new WaitForSeconds(seconds);
-        Debug.Log("2");
         _ignore = false;
     }
 

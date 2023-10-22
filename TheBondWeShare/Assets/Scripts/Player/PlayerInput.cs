@@ -28,6 +28,9 @@ public class PlayerInput : MonoBehaviour
                 {
                     _playerMovement.Move(1);
                 }
+                else 
+                    _playerMovement.Move(0);
+
                 if (Input.GetKeyDown("w"))
                 {
                     _playerMovement.Jump();
@@ -61,6 +64,9 @@ public class PlayerInput : MonoBehaviour
                 {
                     _playerMovement.Move(1);
                 }
+                else
+                    _playerMovement.Move(0);
+
                 if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
                     _playerMovement.Jump();

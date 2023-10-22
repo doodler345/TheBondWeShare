@@ -9,6 +9,7 @@ public class GroundDetection : MonoBehaviour
     [SerializeField] float _rayLength = 1.0f;
 
     public bool grounded;
+    private bool _ignore;
 
     private void FixedUpdate()
     {
@@ -28,7 +29,6 @@ public class GroundDetection : MonoBehaviour
             }
         }
     }
-
     void OnDrawGizmos()
     {
         Debug.DrawRay(transform.position, Vector3.down * _rayLength, Color.blue);

@@ -8,6 +8,6 @@ public class Spawn : MonoBehaviour
 
     private void Start()
     {
-        Instantiate(_playerSetupPrefab, transform);
+        Instantiate(_playerSetupPrefab, transform.position, Quaternion.identity);
     }
 }
