@@ -87,4 +87,15 @@ public class RopeController : MonoBehaviour
         yield return new WaitForSeconds(delay);
        _rope.tearingEnabled = isActive;
     }
+
+    public IEnumerator CutRope(float timeTillDisappear)
+    {
+        int midIndex = _rope.elements.Count / 2;
+        _rope.Tear(_rope.elements[midIndex]);
+        _rope.RebuildConstraintsFromElements();
+
+        yield return new WaitForSeconds(timeTillDisappear);
+
+        Destroy(this.gameObject);
+    }
 }

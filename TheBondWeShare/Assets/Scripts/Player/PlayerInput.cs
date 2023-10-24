@@ -53,6 +53,11 @@ public class PlayerInput : MonoBehaviour
                     _playerMovement.Crane(false);
                 }
 
+                if(Input.GetKeyDown(KeyCode.LeftControl))
+                {
+                    _playerMovement.TearRope();
+                }
+
                 break;
 
             case 1:
@@ -89,6 +94,12 @@ public class PlayerInput : MonoBehaviour
                 {
                     _playerMovement.Crane(false);
                 }
+
+                if (Input.GetKeyDown(KeyCode.RightControl))
+                {
+                    _playerMovement.TearRope();
+                }
+
                 break;
             default: 
                 break;

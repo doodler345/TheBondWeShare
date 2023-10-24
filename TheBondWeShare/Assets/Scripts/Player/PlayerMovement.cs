@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
 
     GroundDetection _groundDetection;
     WallDetection _wallDetection;
-    Coroutine _delayedTearingEnable, _obiKinematicsEnable;
+    Coroutine _delayedTearingEnable, _obiKinematicsEnable, _ropeIsTearing;
 
     Renderer _renderer;
     Color _initColor;
@@ -133,7 +133,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void Anchor(bool setAnchored, int playerID)
     {
-        if (!_groundDetection.grounded) return;
+        if (!_groundDetection.grounded || _ropeController == null) return;
 
         if (setAnchored)
         {
@@ -186,6 +186,13 @@ public class PlayerMovement : MonoBehaviour
         
         _rb.isKinematic = false;
         _obiKinematicsEnable = StartCoroutine(EnableObiKinematics(false, 0.2f));
+    }
+
+    public void TearRope()
+    {
+        if (_ropeIsTearing != null) return;
+        Debug.Log("1");
+        _ropeIsTearing = (StartCoroutine(_ropeController.CutRope(3)));
     }
 
 
