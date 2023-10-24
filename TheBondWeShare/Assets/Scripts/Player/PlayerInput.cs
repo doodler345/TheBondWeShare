@@ -55,7 +55,7 @@ public class PlayerInput : MonoBehaviour
 
                 if(Input.GetKeyDown(KeyCode.LeftControl))
                 {
-                    _playerMovement.TearRope();
+                    _playerMovement.BoundUnbound();
                 }
 
                 break;
@@ -97,7 +97,7 @@ public class PlayerInput : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.RightControl))
                 {
-                    _playerMovement.TearRope();
+                    _playerMovement.BoundUnbound();
                 }
 
                 break;

@@ -188,11 +188,17 @@ public class PlayerMovement : MonoBehaviour
         _obiKinematicsEnable = StartCoroutine(EnableObiKinematics(false, 0.2f));
     }
 
-    public void TearRope()
+    public void BoundUnbound()
     {
-        if (_ropeIsTearing != null) return;
-        Debug.Log("1");
-        _ropeIsTearing = (StartCoroutine(_ropeController.CutRope(3)));
+        if (StageController.instance.isUnbound)
+        {
+            StageController.instance.ReboundPlayers();
+        }
+        else
+        {
+            if (_ropeIsTearing != null) return;
+            _ropeIsTearing = (StartCoroutine(_ropeController.CutRope(3)));
+        }
     }
 
 

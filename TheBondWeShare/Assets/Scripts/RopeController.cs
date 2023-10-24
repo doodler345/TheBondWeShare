@@ -93,6 +93,7 @@ public class RopeController : MonoBehaviour
         int midIndex = _rope.elements.Count / 2;
         _rope.Tear(_rope.elements[midIndex]);
         _rope.RebuildConstraintsFromElements();
+        StageController.instance.isUnbound = true;
 
         yield return new WaitForSeconds(timeTillDisappear);
 
