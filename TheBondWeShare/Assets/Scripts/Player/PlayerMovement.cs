@@ -133,10 +133,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void Anchor(bool setAnchored, int playerID)
     {
-        if (!_groundDetection.grounded || _ropeController == null) return;
-
         if (setAnchored)
         {
+            if (State == STATE.JUMP || !_groundDetection.grounded || StageController.instance.isUnbound) return;
 
             State = STATE.ANCHOR;
 
@@ -148,15 +147,18 @@ public class PlayerMovement : MonoBehaviour
             _renderer.material.color = Color.red;
         }
 
-        else if (State == STATE.ANCHOR)
+        else if (!setAnchored && State == STATE.ANCHOR)
         {
             State = STATE.IDLE;
 
             _rb.isKinematic = false;
 
-            _ropeController.ResetLength();
-            _ropeController.StaticDynamicSwitch(false, playerID);
-            _delayedTearingEnable = StartCoroutine(_ropeController.EnableTearing(true, 0.2f));
+            if (!StageController.instance.isUnbound)
+            {
+                _ropeController.ResetLength();
+                _ropeController.StaticDynamicSwitch(false, playerID);
+                _delayedTearingEnable = StartCoroutine(_ropeController.EnableTearing(true, 0.2f));
+            }
             _renderer.material.color = _initColor;
         }
     }
