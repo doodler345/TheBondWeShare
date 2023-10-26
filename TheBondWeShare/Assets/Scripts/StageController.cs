@@ -28,14 +28,26 @@ public class StageController : MonoBehaviour
 
     private void Start()
     {
-        SpawnPlayers(_spawn.position);
+        SpawnPlayers(_spawn.position, true);
     }
 
-    private void SpawnPlayers(Vector3 position)
+    private void SpawnPlayers(Vector3 position, bool isP1Left)
     {
         _playerSetup = Instantiate(_playerSetupPrefab, position, Quaternion.identity);
-        _player1 = _playerSetup.transform.GetChild(1).gameObject;
-        _player2 = _playerSetup.transform.GetChild(2).gameObject;
+
+        if (isP1Left)
+        {
+            _player1 = _playerSetup.transform.GetChild(1).gameObject;
+            _player2 = _playerSetup.transform.GetChild(2).gameObject;
+        }
+        else
+        {
+            _player1 = _playerSetup.transform.GetChild(2).gameObject;
+            _player2 = _playerSetup.transform.GetChild(1).gameObject;
+        }
+        
+        _player1.GetComponent<PlayerInput>().playerID = 0;
+        _player2.GetComponent<PlayerInput>().playerID = 1;
 
         _ropeController = _playerSetup.GetComponentInChildren<RopeController>();
         isUnbound = false;
@@ -58,8 +70,14 @@ public class StageController : MonoBehaviour
 
 
         respawnPos = p1Pos + 0.5f * (p2Pos - p1Pos);
+
+        bool p1Left;
+        if (_player1.transform.position.x < _player2.transform.position.x) p1Left = true;
+        else 
+            p1Left = false;
+
         DestroyPlayers();
-        SpawnPlayers(respawnPos);
+        SpawnPlayers(respawnPos, p1Left);
     }
 
     private void DestroyPlayers()

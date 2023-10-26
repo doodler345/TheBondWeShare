@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 752806480876530873}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.05, y: 0, z: -0.1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -227,6 +227,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5024873983000157571, guid: 25bd446469215fe46ba2efed01372267, type: 3}
+      propertyPath: playerID
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5024873983000157571, guid: 25bd446469215fe46ba2efed01372267, type: 3}
       propertyPath: _playerID
       value: 1
       objectReference: {fileID: 0}
@@ -244,7 +248,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7370160072750903868, guid: 25bd446469215fe46ba2efed01372267, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.3799999
+      value: 0.088
       objectReference: {fileID: 0}
     - target: {fileID: 7370160072750903868, guid: 25bd446469215fe46ba2efed01372267, type: 3}
       propertyPath: m_LocalPosition.y
@@ -378,6 +382,50 @@ PrefabInstance:
       propertyPath: m_Target
       value: 
       objectReference: {fileID: 98321264334098357}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: restLength_
+      value: 1.3999403
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: elements.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: solverIndices.Array.size
+      value: 158
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: elements.Array.data[0].restLength
+      value: 0.2725413
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: elements.Array.data[1].restLength
+      value: 0.16874887
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: elements.Array.data[2].restLength
+      value: 0.16886114
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: elements.Array.data[3].restLength
+      value: 0.17678533
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: elements.Array.data[4].restLength
+      value: 0.17730314
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: elements.Array.data[5].restLength
+      value: 0.21789047
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: elements.Array.data[6].restLength
+      value: 0.21780986
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198565397509092735, guid: 0b17940f3cf94fe45807cd57679f4060, type: 3}
+      propertyPath: elements.Array.data[7].restLength
+      value: 0.23546031
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

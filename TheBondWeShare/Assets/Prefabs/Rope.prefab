@@ -56,8 +56,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startAttachment: {fileID: 7167979050938898857}
   _endAttachement: {fileID: 798342598170977138}
-  _minLength: 2.8
-  _maxLength: 3.5
+  _minLength: 2.5
+  _maxLength: 3
   _tearingPossible: 0
 --- !u!114 &7198565397509092735
 MonoBehaviour:

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8583407543967393953}
   - component: {fileID: 3907911068099922391}
   - component: {fileID: 7232086475469098902}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RopeConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -82,7 +82,7 @@ GameObject:
   - component: {fileID: 3617000581384873794}
   - component: {fileID: 8444739051020246817}
   - component: {fileID: 2281617072094487459}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -167,7 +167,7 @@ GameObject:
   - component: {fileID: -2457779600598514567}
   - component: {fileID: 5134999027986046707}
   - component: {fileID: 2757346214734174978}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -274,7 +274,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3783991785144208330}
   - component: {fileID: 6559033989238525448}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallDetect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,7 +332,7 @@ GameObject:
   - component: {fileID: 7882798335983509459}
   - component: {fileID: 7821474800900002545}
   - component: {fileID: 1479257858518235590}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GroundDetect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -376,7 +376,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _groundLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 320
   _rayLength: 0.25
   grounded: 0
 --- !u!1 &7548300470721292378
@@ -392,7 +392,7 @@ GameObject:
   - component: {fileID: 3690190567173012419}
   - component: {fileID: 8293993616300314323}
   - component: {fileID: 931769714386717435}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
