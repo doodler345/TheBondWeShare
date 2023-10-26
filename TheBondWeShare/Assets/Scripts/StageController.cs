@@ -9,7 +9,7 @@ public class StageController : MonoBehaviour
     private GameObject _playerSetup, _player1, _player2;
     [SerializeField] Transform _spawn;
 
-    [SerializeField] float _maxReboundDistance = 2;
+    [SerializeField] float _maxReboundDistance = 4;
     public bool isUnbound;
 
     public static StageController instance;
@@ -63,8 +63,8 @@ public class StageController : MonoBehaviour
         Vector3 p1Pos = _player1.transform.position;
         Vector3 p2Pos = _player2.transform.position;
 
-        distance = Vector3.Distance(p1Pos, p2Pos);
-            Debug.Log("Playerdistance: " +  distance);
+        distance = (p1Pos - p2Pos).sqrMagnitude;
+            Debug.Log("Playerdistance sqr: " +  distance);
 
         if (distance > _maxReboundDistance) return;
 
