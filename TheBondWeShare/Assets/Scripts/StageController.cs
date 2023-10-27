@@ -5,12 +5,12 @@ using UnityEngine;
 public class StageController : MonoBehaviour
 {
     [SerializeField] GameObject _playerSetupPrefab;
-    RopeController _ropeController;
-    private GameObject _playerSetup, _player1, _player2;
+    [SerializeField] VCamController _vCamController;
     [SerializeField] Transform _spawn;
-
     [SerializeField] float _maxReboundDistance = 4;
     public bool isUnbound;
+
+    private GameObject _playerSetup, _player1, _player2;
 
     public static StageController instance;
 
@@ -49,8 +49,9 @@ public class StageController : MonoBehaviour
         _player1.GetComponent<PlayerInput>().playerID = 0;
         _player2.GetComponent<PlayerInput>().playerID = 1;
 
-        _ropeController = _playerSetup.GetComponentInChildren<RopeController>();
         isUnbound = false;
+        
+        _vCamController.SetPlayers(_player1.transform, _player2.transform);
     }
 
     public void ReboundPlayers()
