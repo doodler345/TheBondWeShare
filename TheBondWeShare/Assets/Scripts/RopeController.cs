@@ -94,6 +94,7 @@ public class RopeController : MonoBehaviour
         _rope.Tear(_rope.elements[midIndex]);
         _rope.RebuildConstraintsFromElements();
         StageController.instance.isUnbound = true;
+        StageController.instance.SwitchWorld(false);
 
         yield return new WaitForSeconds(timeTillDisappear);
 

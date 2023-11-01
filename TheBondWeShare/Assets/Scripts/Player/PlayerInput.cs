@@ -37,11 +37,11 @@ public class PlayerInput : MonoBehaviour
                 }
                 else if (Input.GetKeyDown("s"))
                 {
-                    _playerMovement.Down(true, playerID);
+                    _playerMovement.Down(true);
                 }
                 else if (Input.GetKeyUp("s"))
                 {
-                    _playerMovement.Down(false, playerID);
+                    _playerMovement.Down(false);
                 }
                 if (Input.GetKey("q"))
                 {
@@ -78,11 +78,11 @@ public class PlayerInput : MonoBehaviour
                 }
                 else if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    _playerMovement.Down(true, playerID);
+                    _playerMovement.Down(true);
                 }
                 else if (Input.GetKeyUp(KeyCode.DownArrow))
                 {
-                    _playerMovement.Down(false, playerID);
+                    _playerMovement.Down(false);
                 }
 
                 if (Input.GetKey("o"))
