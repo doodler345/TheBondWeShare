@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
 
     GroundDetection _groundDetection;
     WallDetection _wallDetection;
+    MoveableDetection _moveableDetection;
     Coroutine _delayedTearingEnable, _obiKinematicsEnable, _ropeIsTearing;
 
     Renderer _renderer;
@@ -32,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
         _obiRB = GetComponent<ObiRigidbody>();
         _groundDetection = GetComponentInChildren<GroundDetection>();
         _wallDetection = GetComponentInChildren<WallDetection>();
+        _moveableDetection = GetComponentInChildren<MoveableDetection>();
     }
 
     private void Update()
