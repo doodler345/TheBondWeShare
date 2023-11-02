@@ -14,6 +14,7 @@ public class WallDetection : MonoBehaviour
     [SerializeField] LayerMask _groundLayer;
     [SerializeField] float _ledgeRayLength = 1.0f;
     [SerializeField] Vector3 _ledgeRayOffset;
+    RaycastHit _ledgeHit;
     PlayerMovement _playerMovement;
     Rigidbody _rb;
     public bool hanging;
@@ -49,7 +50,7 @@ public class WallDetection : MonoBehaviour
         //ledge
         if (_ignore) return;
 
-        if (_rb.velocity.y < 0 && Physics.Raycast(transform.position + _ledgeRayOffset, Vector3.down, _ledgeRayLength, _groundLayer))
+        if (_rb.velocity.y < 0 && Physics.Raycast(transform.position + _ledgeRayOffset, Vector3.down, out _ledgeHit, _ledgeRayLength, _groundLayer))
         {
             if (!hanging)
             {
@@ -70,6 +71,11 @@ public class WallDetection : MonoBehaviour
         _ignore = true;
         yield return new WaitForSeconds(seconds);
         _ignore = false;
+    }
+
+    public int GetLedgePlatformType()
+    {
+        return _ledgeHit.transform.GetComponent<Platform>().type;
     }
 
     void OnDrawGizmos()

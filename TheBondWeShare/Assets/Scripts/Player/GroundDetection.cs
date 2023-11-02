@@ -6,14 +6,15 @@ using Obi;
 public class GroundDetection : MonoBehaviour
 {
     [SerializeField] LayerMask _groundLayer;
-    [SerializeField] float _rayLength = 1.0f;
+    RaycastHit _hit;
 
+    [SerializeField] float _rayLength = 1.0f;
     public bool grounded;
     private bool _ignore;
 
     private void FixedUpdate()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, _rayLength, _groundLayer))
+        if (Physics.Raycast(transform.position, Vector3.down, out _hit, _rayLength, _groundLayer))
         {
             if(!grounded)
             {
@@ -29,6 +30,12 @@ public class GroundDetection : MonoBehaviour
             }
         }
     }
+
+    public int GetPlatformType()
+    {
+        return _hit.transform.GetComponent<Platform>().type;
+    }
+
     void OnDrawGizmos()
     {
         Debug.DrawRay(transform.position, Vector3.down * _rayLength, Color.blue);

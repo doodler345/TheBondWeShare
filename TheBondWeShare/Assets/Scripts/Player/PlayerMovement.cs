@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Obi;
+using UnityEditor.Experimental.GraphView;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -14,11 +15,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float _hangingJumpBoost = 2;
     int _tmpDirection = 1;
     Rigidbody _rb;
+    int _playerID;
     ObiRigidbody _obiRB;
 
     GroundDetection _groundDetection;
     WallDetection _wallDetection;
-    Coroutine _delayedTearingEnable, _obiKinematicsEnable, _ropeIsTearing;
+    MoveableDetection _moveableDetection;
+    Coroutine _delayedTearingEnable, _obiKinematicsEnable;
 
     Renderer _renderer;
     Color _initColor;
@@ -32,6 +35,8 @@ public class PlayerMovement : MonoBehaviour
         _obiRB = GetComponent<ObiRigidbody>();
         _groundDetection = GetComponentInChildren<GroundDetection>();
         _wallDetection = GetComponentInChildren<WallDetection>();
+        _moveableDetection = GetComponentInChildren<MoveableDetection>();
+        _playerID = GetComponent<PlayerInput>().playerID;
     }
 
     private void Update()
@@ -58,6 +63,22 @@ public class PlayerMovement : MonoBehaviour
             default: 
                 break;
         }
+    }
+
+    public void SwitchWorld()
+    {
+        if (State == STATE.ANCHOR)
+        {
+            if (_groundDetection.GetPlatformType() == 0) return;
+            else Anchor(false);
+        }
+        else if (State == STATE.HANGING)
+        {
+            if (_wallDetection.GetLedgePlatformType() == 0) return;
+            else LedgeUnhang();
+        }
+
+        State = STATE.FALL;
     }
 
     public void Move(int xVelocity)
@@ -119,7 +140,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void Down(bool setAnchored, int playerID)
+    public void Down(bool setAnchored)
     {
         if (State == STATE.HANGING)
         {
@@ -128,15 +149,14 @@ public class PlayerMovement : MonoBehaviour
         }
 
         else 
-            Anchor(setAnchored, playerID);
+            Anchor(setAnchored);
     }
 
-    public void Anchor(bool setAnchored, int playerID)
+    public void Anchor(bool setAnchored)
     {
-        if (!_groundDetection.grounded || _ropeController == null) return;
-
         if (setAnchored)
         {
+            if (State == STATE.JUMP || !_groundDetection.grounded || StageController.instance.isUnbound) return;
 
             State = STATE.ANCHOR;
 
@@ -144,19 +164,22 @@ public class PlayerMovement : MonoBehaviour
 
             if (_delayedTearingEnable != null) StopCoroutine(_delayedTearingEnable);
             _delayedTearingEnable = StartCoroutine(_ropeController.EnableTearing(false, 0));
-            _ropeController.StaticDynamicSwitch(true, playerID);
+            _ropeController.StaticDynamicSwitch(true, _playerID);
             _renderer.material.color = Color.red;
         }
 
-        else if (State == STATE.ANCHOR)
+        else if (!setAnchored && State == STATE.ANCHOR)
         {
             State = STATE.IDLE;
 
             _rb.isKinematic = false;
 
-            _ropeController.ResetLength();
-            _ropeController.StaticDynamicSwitch(false, playerID);
-            _delayedTearingEnable = StartCoroutine(_ropeController.EnableTearing(true, 0.2f));
+            if (!StageController.instance.isUnbound)
+            {
+                _ropeController.ResetLength();
+                _ropeController.StaticDynamicSwitch(false, _playerID);
+                _delayedTearingEnable = StartCoroutine(_ropeController.EnableTearing(true, 0.2f));
+            }
             _renderer.material.color = _initColor;
         }
     }
@@ -188,11 +211,16 @@ public class PlayerMovement : MonoBehaviour
         _obiKinematicsEnable = StartCoroutine(EnableObiKinematics(false, 0.2f));
     }
 
-    public void TearRope()
+    public void BoundUnbound()
     {
-        if (_ropeIsTearing != null) return;
-        Debug.Log("1");
-        _ropeIsTearing = (StartCoroutine(_ropeController.CutRope(3)));
+        if (StageController.instance.isUnbound)
+        {
+            StageController.instance.ReboundPlayers();
+        }
+        else
+        {
+            StageController.instance.UnboundPlayers();
+        }
     }
 
 

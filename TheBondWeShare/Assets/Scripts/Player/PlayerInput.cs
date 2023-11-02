@@ -6,7 +6,7 @@ using Unity.VisualScripting;
 
 public class PlayerInput : MonoBehaviour
 {
-    [SerializeField] int _playerID;
+    public int playerID;
     PlayerMovement _playerMovement;
 
     private void Awake()
@@ -16,7 +16,7 @@ public class PlayerInput : MonoBehaviour
 
     private void Update()
     {
-        switch (_playerID)
+        switch (playerID)
         {
             case 0:
 
@@ -37,11 +37,11 @@ public class PlayerInput : MonoBehaviour
                 }
                 else if (Input.GetKeyDown("s"))
                 {
-                    _playerMovement.Down(true, _playerID);
+                    _playerMovement.Down(true);
                 }
                 else if (Input.GetKeyUp("s"))
                 {
-                    _playerMovement.Down(false, _playerID);
+                    _playerMovement.Down(false);
                 }
                 if (Input.GetKey("q"))
                 {
@@ -55,7 +55,7 @@ public class PlayerInput : MonoBehaviour
 
                 if(Input.GetKeyDown(KeyCode.LeftControl))
                 {
-                    _playerMovement.TearRope();
+                    _playerMovement.BoundUnbound();
                 }
 
                 break;
@@ -78,11 +78,11 @@ public class PlayerInput : MonoBehaviour
                 }
                 else if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    _playerMovement.Down(true, _playerID);
+                    _playerMovement.Down(true);
                 }
                 else if (Input.GetKeyUp(KeyCode.DownArrow))
                 {
-                    _playerMovement.Down(false, _playerID);
+                    _playerMovement.Down(false);
                 }
 
                 if (Input.GetKey("o"))
@@ -97,7 +97,7 @@ public class PlayerInput : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.RightControl))
                 {
-                    _playerMovement.TearRope();
+                    _playerMovement.BoundUnbound();
                 }
 
                 break;
