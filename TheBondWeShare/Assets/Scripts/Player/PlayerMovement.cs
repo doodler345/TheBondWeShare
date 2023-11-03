@@ -9,11 +9,13 @@ public class PlayerMovement : MonoBehaviour
     public STATE State;
     [SerializeField] RopeController _ropeController;
     [SerializeField] Transform _playerModel;
+    private MoveableObject _moveableObject;
     private Vector3 _walkVelocity;
-    [SerializeField] float _speed = 0.5f;
+    [SerializeField] float _walkSpeed = 5f, _pushPullSpeed = 3f;
     [SerializeField] int _jumpForce = 15;
     [SerializeField] float _hangingJumpBoost = 2;
     int _tmpDirection = 1;
+    float _tmpPosX;
     int _playerID;
     bool _doubleJmpPossible;
 
@@ -31,23 +33,33 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
-        _renderer = GetComponentInChildren<Renderer>();
-        _initColor = _renderer.material.color;
+        _playerID = GetComponent<PlayerInput>().playerID;
         _rb = GetComponent<Rigidbody>();
         _obiRB = GetComponent<ObiRigidbody>();
+        _renderer = GetComponentInChildren<Renderer>();
+        _initColor = _renderer.material.color;
         _groundDetection = GetComponentInChildren<GroundDetection>();
         _wallDetection = GetComponentInChildren<WallDetection>();
         _moveableDetection = GetComponentInChildren<MoveableDetection>();
-        _playerID = GetComponent<PlayerInput>().playerID;
     }
 
     private void Update()
     {
         switch (State)
         {
-            case STATE.WALK:
-                if (_rb.velocity.y < 0)
+            case STATE.IDLE:
+                if (_rb.velocity.y < 0 && !_groundDetection.grounded)
                     State = STATE.FALL;
+                break;
+
+            case STATE.WALK:
+                if (_rb.velocity.y < 0 && !_groundDetection.grounded)
+                    State = STATE.FALL;
+                break;
+
+            case STATE.PUSHPULL_OBJECT:
+                if (_rb.velocity.y < 0 && !_groundDetection.grounded)
+                    PushPullObject(false);
                 break;
 
             case STATE.JUMP:
@@ -92,23 +104,38 @@ public class PlayerMovement : MonoBehaviour
 
         if (xVelocity == 0)
         {
-            if (!(State == STATE.JUMP || State == STATE.FALL) && _groundDetection.grounded) 
+            if (!(State == STATE.JUMP || State == STATE.FALL || State == STATE.PUSHPULL_OBJECT) && _groundDetection.grounded) 
                 State = STATE.IDLE;
             return;
         }
         else
         {
+            float speedX = xVelocity;
+
             CheckForTurn(xVelocity);
 
-            if (_wallDetection.facingWall)
+            if (!(State == STATE.PUSHPULL_OBJECT) && _wallDetection.facingWall)
             {
                 State = STATE.IDLE;
                 return;
             }
 
-            State = STATE.WALK;
+            else if (State == STATE.PUSHPULL_OBJECT)
+            {
+                speedX *= _pushPullSpeed;
 
-            _walkVelocity = new Vector3(xVelocity * _speed, 0, 0);
+                float deltaX = transform.position.x - _tmpPosX;
+                _moveableObject.PushPull(deltaX);
+            }
+
+            else
+            {
+                State = STATE.WALK;
+                speedX *= _walkSpeed;                
+            }
+
+            _walkVelocity = new Vector3(speedX, 0, 0);
+            _tmpPosX = transform.position.x;
             _rb.MovePosition(transform.position += _walkVelocity * Time.deltaTime);
         }
     }
@@ -119,6 +146,7 @@ public class PlayerMovement : MonoBehaviour
         {
             _playerModel.LookAt(_playerModel.position + new Vector3(directionX, 0, 0));
             _wallDetection.Turn();
+            _moveableDetection.Turn();
             
             _tmpDirection = directionX;
         }
@@ -127,7 +155,7 @@ public class PlayerMovement : MonoBehaviour
     public void Jump()
     {
         if (!_groundDetection.grounded && !_doubleJmpPossible && !(State == STATE.HANGING)) return;
-        else if (State == STATE.ANCHOR) return;
+        else if (State == STATE.ANCHOR || State == STATE.PUSHPULL_OBJECT) return;
 
         State = STATE.JUMP;
 
@@ -141,6 +169,7 @@ public class PlayerMovement : MonoBehaviour
 
         else
         {
+            _rb.velocity = Vector3.zero;
             _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
             _doubleJmpPossible = !_doubleJmpPossible;
         }
@@ -162,7 +191,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (setAnchored)
         {
-            if (State == STATE.JUMP || !_groundDetection.grounded || StageController.instance.isUnbound) return;
+            if (State == STATE.JUMP || State == STATE.PUSHPULL_OBJECT || !_groundDetection.grounded || StageController.instance.isUnbound) return;
 
             State = STATE.ANCHOR;
 
@@ -216,6 +245,12 @@ public class PlayerMovement : MonoBehaviour
         _rb.isKinematic = false;
         _obiKinematicsEnable = StartCoroutine(EnableObiKinematics(false, 0.2f));
     }
+    IEnumerator EnableObiKinematics(bool isActive, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        _obiRB.kinematicForParticles = isActive;
+    }
+
 
     public void BoundUnbound()
     {
@@ -229,22 +264,36 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
-    IEnumerator EnableObiKinematics(bool isActive, float delay)
+    public void PushPullObject(bool isGrabbing)
     {
-        yield return new WaitForSeconds(delay);
-        _obiRB.kinematicForParticles = isActive;
+        if (!isGrabbing && State == STATE.PUSHPULL_OBJECT)
+        {
+            State = STATE.IDLE;
+            _moveableObject.getsMoved = false;
+            _moveableObject = null;
+            return;
+        }
+
+        if (!_moveableDetection.detected || !_groundDetection.grounded || (State == STATE.ANCHOR) ) return;
+        _moveableObject = _moveableDetection.GetDetectedObject();
+
+        if (_moveableObject.getsMoved) return;
+
+        _moveableObject.getsMoved = true;
+        State = STATE.PUSHPULL_OBJECT;
     }
+
+
 
 
     public enum STATE
     {
         IDLE,
-        FALL,
         WALK,
         JUMP,
+        HANGING,
+        FALL,
         ANCHOR,
-        CRANE,
-        HANGING
+        PUSHPULL_OBJECT
     }
 }

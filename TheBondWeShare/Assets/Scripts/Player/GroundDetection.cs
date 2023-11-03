@@ -9,12 +9,13 @@ public class GroundDetection : MonoBehaviour
     RaycastHit _hit;
 
     [SerializeField] float _rayLength = 1.0f;
+    [SerializeField] Vector3 _rayOffset;
     public bool grounded;
     private bool _ignore;
 
     private void FixedUpdate()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out _hit, _rayLength, _groundLayer))
+        if (Physics.Raycast(transform.position + _rayOffset, Vector3.down, out _hit, _rayLength, _groundLayer) || Physics.Raycast(transform.position - _rayOffset, Vector3.down, out _hit, _rayLength, _groundLayer))
         {
             if(!grounded)
             {
@@ -38,6 +39,7 @@ public class GroundDetection : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Debug.DrawRay(transform.position, Vector3.down * _rayLength, Color.blue);
+        Debug.DrawRay(transform.position + _rayOffset, Vector3.down * _rayLength, Color.blue);
+        Debug.DrawRay(transform.position - _rayOffset, Vector3.down * _rayLength, Color.blue);
     }
 }

@@ -53,6 +53,15 @@ public class PlayerInput : MonoBehaviour
                     _playerMovement.Crane(false);
                 }
 
+                if (Input.GetKeyDown("t"))
+                {
+                    _playerMovement.PushPullObject(true);
+                }                
+                else if (Input.GetKeyUp("t"))
+                {
+                    _playerMovement.PushPullObject(false);
+                }
+
                 if(Input.GetKeyDown(KeyCode.LeftControl))
                 {
                     _playerMovement.BoundUnbound();
@@ -93,6 +102,15 @@ public class PlayerInput : MonoBehaviour
                 if (Input.GetKey("p"))
                 {
                     _playerMovement.Crane(false);
+                }
+                
+                if (Input.GetKeyDown("m"))
+                {
+                    _playerMovement.PushPullObject(true);
+                }
+                else if (Input.GetKeyUp("m"))
+                {
+                    _playerMovement.PushPullObject(false);
                 }
 
                 if (Input.GetKeyDown(KeyCode.RightControl))

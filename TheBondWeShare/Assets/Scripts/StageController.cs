@@ -38,6 +38,7 @@ public class StageController : MonoBehaviour
 
     private void SpawnPlayers(Vector3 position, bool isP1Left)
     {
+        Debug.Log(_playerSetupPrefab + " " + position);
         _playerSetup = Instantiate(_playerSetupPrefab, position, Quaternion.identity);
         _ropeController = _playerSetup.GetComponentInChildren<RopeController>();
 

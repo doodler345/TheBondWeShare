@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 981354210235086559}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.96}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a3de7dda67ccb34d8ef263cc6048413, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerID: 0
+  playerID: 1
 --- !u!114 &-2457779600598514567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,8 +222,9 @@ MonoBehaviour:
   State: 0
   _ropeController: {fileID: 0}
   _playerModel: {fileID: 7655933471050827076}
-  _speed: 5
-  _jumpForce: 10
+  _walkSpeed: 5
+  _pushPullSpeed: 3
+  _jumpForce: 15
   _hangingJumpBoost: 1.5
 --- !u!54 &5134999027986046707
 Rigidbody:
@@ -264,7 +265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62359d80fdc0e4315ab6331b78ec5b90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  kinematicForParticles: 1
+  kinematicForParticles: 0
 --- !u!1 &3638996664090547900
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,7 +312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _wallLayer:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 704
   _wallRayLength: 0.5
   _halfExtends: {x: 0.3, y: 1, z: 0.75}
   _wallRaydirection: {x: 1, y: 0, z: 0}
@@ -351,7 +352,7 @@ Transform:
   m_GameObject: {fileID: 5291324639715050290}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.4876, y: -0.03, z: 0}
+  m_LocalPosition: {x: 0.5, y: -0.03, z: 0}
   m_LocalScale: {x: 0.8952, y: 1, z: 0.8037}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -440,7 +441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 967a05369ba59e84a998b7914ccc5428, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMoveable: 0
+  detected: 0
 --- !u!1 &7370920281479957182
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,7 +469,7 @@ Transform:
   m_GameObject: {fileID: 7370920281479957182}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.95, z: 0}
+  m_LocalPosition: {x: 0, y: -0.967, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -498,6 +499,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 320
   _rayLength: 0.25
+  _rayOffset: {x: 0.25, y: 0, z: 0}
   grounded: 0
 --- !u!1 &7548300470721292378
 GameObject:
@@ -527,14 +529,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7548300470721292378}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3617000581384873794}
   m_Father: {fileID: 7370160072750903868}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!33 &4159072564258177634
 MeshFilter:
   m_ObjectHideFlags: 0

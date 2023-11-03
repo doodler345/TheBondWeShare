@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class MoveableDetection : MonoBehaviour
 {
-    public bool isMoveable;
+    public bool detected;
+    private MoveableObject detectedObject;
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Moveable")
         {
-            isMoveable = true;
+            detected = true;
+            detectedObject = other.GetComponent<MoveableObject>();
         }
     }
 
@@ -17,7 +20,20 @@ public class MoveableDetection : MonoBehaviour
     {
         if (other.gameObject.tag == "Moveable")
         {
-            isMoveable = false;
+            detected = false;
+            detectedObject = null;
         }
     }
+
+    public MoveableObject GetDetectedObject()
+    {
+        return detectedObject;
+    }
+
+    public void Turn()
+    {
+        Vector3 pos = transform.localPosition;
+        transform.localPosition = new Vector3(-pos.x, pos.y, 0); 
+    }
+
 }
