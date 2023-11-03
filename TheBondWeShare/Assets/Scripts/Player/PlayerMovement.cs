@@ -14,8 +14,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] int _jumpForce = 15;
     [SerializeField] float _hangingJumpBoost = 2;
     int _tmpDirection = 1;
-    Rigidbody _rb;
     int _playerID;
+    bool _doubleJmpPossible;
+
+    Rigidbody _rb;
     ObiRigidbody _obiRB;
 
     GroundDetection _groundDetection;
@@ -65,7 +67,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void SwitchWorld()
+    public void WorldSwitch()
     {
         if (State == STATE.ANCHOR)
         {
@@ -124,7 +126,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void Jump()
     {
-        if ((!_groundDetection.grounded && !(State == STATE.HANGING)) || State == STATE.ANCHOR) return;
+        if (!_groundDetection.grounded && !_doubleJmpPossible && !(State == STATE.HANGING)) return;
+        else if (State == STATE.ANCHOR) return;
 
         State = STATE.JUMP;
 
@@ -132,11 +135,14 @@ public class PlayerMovement : MonoBehaviour
         {
             LedgeUnhang();
             _rb.AddForce(Vector3.up * _jumpForce * _hangingJumpBoost, ForceMode.Impulse);
+            _doubleJmpPossible = false;
+            return;
         }
 
         else
         {
             _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
+            _doubleJmpPossible = !_doubleJmpPossible;
         }
     }
 

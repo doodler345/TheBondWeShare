@@ -121,7 +121,7 @@ public class StageController : MonoBehaviour
             world2.SetActive(true);
         }
 
-        _player1.GetComponent<PlayerMovement>().SwitchWorld();
-        _player2.GetComponent<PlayerMovement>().SwitchWorld();
+        _player1.GetComponent<PlayerMovement>().WorldSwitch();
+        _player2.GetComponent<PlayerMovement>().WorldSwitch();
     }
 }
