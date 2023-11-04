@@ -10,14 +10,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] RopeController _ropeController;
     [SerializeField] Transform _playerModel;
     private MoveableObject _moveableObject;
-    private Vector3 _walkVelocity;
-    [SerializeField] float _walkSpeed = 5f, _pushPullSpeed = 3f;
+    private Vector3 _walkVelocity, _climbVelocity;
+    [SerializeField] float _walkSpeed = 5f, _pushPullSpeed = 3f, _climbSpeed = 3f;
     [SerializeField] int _jumpForce = 15;
     [SerializeField] float _hangingJumpBoost = 2;
+    [SerializeField] bool _allowDoubleJump;
     int _tmpDirection = 1;
     float _tmpPosX;
     int _playerID;
     bool _doubleJmpPossible;
+    bool _ladderClimb, _ladderClimbUP; //murks
 
     Rigidbody _rb;
     ObiRigidbody _obiRB;
@@ -25,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     GroundDetection _groundDetection;
     WallDetection _wallDetection;
     MoveableDetection _moveableDetection;
+    LadderDetection _ladderDetection;
     Coroutine _delayedTearingEnable, _obiKinematicsEnable;
 
     Renderer _renderer;
@@ -41,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
         _groundDetection = GetComponentInChildren<GroundDetection>();
         _wallDetection = GetComponentInChildren<WallDetection>();
         _moveableDetection = GetComponentInChildren<MoveableDetection>();
+        _ladderDetection = GetComponentInChildren<LadderDetection>();
     }
 
     private void Update()
@@ -74,6 +78,17 @@ public class PlayerMovement : MonoBehaviour
                     State = STATE.IDLE;
                 break;
 
+            case STATE.LADDERCLIMB:
+                LadderClimb(_climbVelocity);
+                if (!_ladderDetection.detected)
+                {
+                    _climbVelocity = Vector3.zero;
+                    _rb.useGravity = true;
+                    State = STATE.IDLE;
+                }
+
+                break;
+
             default: 
                 break;
         }
@@ -104,7 +119,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (xVelocity == 0)
         {
-            if (!(State == STATE.JUMP || State == STATE.FALL || State == STATE.PUSHPULL_OBJECT) && _groundDetection.grounded) 
+            if (!(State == STATE.JUMP || State == STATE.FALL || State == STATE.PUSHPULL_OBJECT || State == STATE.LADDERCLIMB) && _groundDetection.grounded) 
                 State = STATE.IDLE;
             return;
         }
@@ -126,6 +141,11 @@ public class PlayerMovement : MonoBehaviour
 
                 float deltaX = transform.position.x - _tmpPosX;
                 _moveableObject.PushPull(deltaX);
+            }
+
+            else if (State == STATE.LADDERCLIMB)
+            {
+                speedX *= _climbSpeed;
             }
 
             else
@@ -171,20 +191,66 @@ public class PlayerMovement : MonoBehaviour
         {
             _rb.velocity = Vector3.zero;
             _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
-            _doubleJmpPossible = !_doubleJmpPossible;
+            if(_allowDoubleJump) _doubleJmpPossible = !_doubleJmpPossible;
         }
     }
 
-    public void Down(bool setAnchored)
+    void LadderClimb(Vector3 yVelocity)
     {
-        if (State == STATE.HANGING)
+        _rb.MovePosition(transform.position += yVelocity * Time.deltaTime);
+    }
+
+    public void Up(bool keyDown)
+    {
+        if (keyDown)
         {
-            State = STATE.FALL;
-            LedgeUnhang();
+            if (_ladderDetection.detected)
+            {
+                if (State != STATE.LADDERCLIMB)
+                {
+                    _rb.useGravity = false;
+                    _rb.velocity = Vector3.zero;
+                    State = STATE.LADDERCLIMB;
+                }
+                if(_climbVelocity.normalized != Vector3.up) _climbVelocity = Vector3.up * _climbSpeed;
+            }
+
+            else
+                Jump();
         }
 
-        else 
-            Anchor(setAnchored);
+        else
+        {
+            if (State == STATE.LADDERCLIMB) _climbVelocity = Vector3.zero;
+        }
+    }
+
+    public void Down(bool keyDown)
+    {
+        if (keyDown)
+        {
+            if (State == STATE.HANGING)
+            {
+                State = STATE.FALL;
+                LedgeUnhang();
+            }
+
+            else if (State == STATE.LADDERCLIMB)
+            {
+                if (_climbVelocity.normalized != Vector3.down) _climbVelocity = Vector3.down * _climbSpeed;
+            }
+
+            else
+                Anchor(keyDown);
+        }
+
+        else
+        {
+            if (State == STATE.LADDERCLIMB) _climbVelocity = Vector3.zero;
+
+            else
+                Anchor(keyDown);
+        }
     }
 
     public void Anchor(bool setAnchored)
@@ -229,6 +295,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void LedgeHang()
     {
+        if (State == STATE.LADDERCLIMB) return;
+
         State = STATE.HANGING;
 
         _rb.isKinematic = true;
@@ -294,6 +362,7 @@ public class PlayerMovement : MonoBehaviour
         HANGING,
         FALL,
         ANCHOR,
-        PUSHPULL_OBJECT
+        PUSHPULL_OBJECT,
+        LADDERCLIMB
     }
 }

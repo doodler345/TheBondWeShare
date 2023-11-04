@@ -33,7 +33,11 @@ public class PlayerInput : MonoBehaviour
 
                 if (Input.GetKeyDown("w"))
                 {
-                    _playerMovement.Jump();
+                    _playerMovement.Up(true);
+                }               
+                else if (Input.GetKeyUp("w"))
+                {
+                    _playerMovement.Up(false);
                 }
                 else if (Input.GetKeyDown("s"))
                 {
@@ -83,7 +87,11 @@ public class PlayerInput : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
-                    _playerMovement.Jump();
+                    _playerMovement.Up(true);
+                }
+                else if (Input.GetKeyUp(KeyCode.UpArrow))
+                {
+                    _playerMovement.Up(false);
                 }
                 else if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
