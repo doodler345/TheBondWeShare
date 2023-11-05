@@ -52,16 +52,13 @@ public class PlayerMovement : MonoBehaviour
         switch (State)
         {
             case STATE.IDLE:
-                if (_rb.velocity.y < 0 && !_groundDetection.grounded)
-                    State = STATE.FALL;
-                break;
-
             case STATE.WALK:
                 if (_rb.velocity.y < 0 && !_groundDetection.grounded)
                     State = STATE.FALL;
                 break;
 
-            case STATE.PUSHPULL_OBJECT:
+            case STATE.PUSH_OBJECT:
+            case STATE.PULL_OBJECT:
                 if (_rb.velocity.y < 0 && !_groundDetection.grounded)
                     PushPullObject(false);
                 break;
@@ -119,7 +116,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (xVelocity == 0)
         {
-            if (!(State == STATE.JUMP || State == STATE.FALL || State == STATE.PUSHPULL_OBJECT || State == STATE.LADDERCLIMB) && _groundDetection.grounded) 
+            if (!(State == STATE.JUMP || State == STATE.FALL || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || State == STATE.LADDERCLIMB) && _groundDetection.grounded) 
                 State = STATE.IDLE;
             return;
         }
@@ -129,13 +126,13 @@ public class PlayerMovement : MonoBehaviour
 
             CheckForTurn(xVelocity);
 
-            if (!(State == STATE.PUSHPULL_OBJECT) && _wallDetection.facingWall)
+            if (!(State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT) && _wallDetection.facingWall)
             {
                 State = STATE.IDLE;
                 return;
             }
 
-            else if (State == STATE.PUSHPULL_OBJECT)
+            else if (State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT)
             {
                 speedX *= _pushPullSpeed;
 
@@ -167,7 +164,12 @@ public class PlayerMovement : MonoBehaviour
             _playerModel.LookAt(_playerModel.position + new Vector3(directionX, 0, 0));
             _wallDetection.Turn();
             _moveableDetection.Turn();
-            
+
+            if(State == STATE.PULL_OBJECT)
+                State = STATE.PUSH_OBJECT;
+            else if (State == STATE.PUSH_OBJECT)
+                State = STATE.PULL_OBJECT;
+
             _tmpDirection = directionX;
         }
     }
@@ -175,7 +177,7 @@ public class PlayerMovement : MonoBehaviour
     public void Jump()
     {
         if (!_groundDetection.grounded && !_doubleJmpPossible && !(State == STATE.HANGING)) return;
-        else if (State == STATE.ANCHOR || State == STATE.PUSHPULL_OBJECT) return;
+        else if (State == STATE.ANCHOR || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT) return;
 
         State = STATE.JUMP;
 
@@ -257,7 +259,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (setAnchored)
         {
-            if (State == STATE.JUMP || State == STATE.PUSHPULL_OBJECT || !_groundDetection.grounded || StageController.instance.isUnbound) return;
+            if (State == STATE.JUMP || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || !_groundDetection.grounded || StageController.instance.isUnbound) return;
 
             State = STATE.ANCHOR;
 
@@ -334,7 +336,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void PushPullObject(bool isGrabbing)
     {
-        if (!isGrabbing && State == STATE.PUSHPULL_OBJECT)
+        if (!isGrabbing && (State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT))
         {
             State = STATE.IDLE;
             _moveableObject.getsMoved = false;
@@ -348,7 +350,7 @@ public class PlayerMovement : MonoBehaviour
         if (_moveableObject.getsMoved) return;
 
         _moveableObject.getsMoved = true;
-        State = STATE.PUSHPULL_OBJECT;
+        State = STATE.PUSH_OBJECT;
     }
 
 
@@ -362,7 +364,8 @@ public class PlayerMovement : MonoBehaviour
         HANGING,
         FALL,
         ANCHOR,
-        PUSHPULL_OBJECT,
+        PUSH_OBJECT,
+        PULL_OBJECT,
         LADDERCLIMB
     }
 }
