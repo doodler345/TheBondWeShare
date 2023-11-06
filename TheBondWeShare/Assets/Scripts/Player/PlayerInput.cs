@@ -47,12 +47,17 @@ public class PlayerInput : MonoBehaviour
                 {
                     _playerMovement.Down(false);
                 }
-                if (Input.GetKey("q"))
+
+                if(Input.GetKeyDown("e"))
+                {
+                    _playerMovement.PressButton();
+                }
+
+                if (Input.GetKey("r"))
                 {
                     _playerMovement.Crane(true);
                 }
-
-                if (Input.GetKey("e"))
+                if (Input.GetKey("t"))
                 {
                     _playerMovement.Crane(false);
                 }

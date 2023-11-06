@@ -168,7 +168,7 @@ GameObject:
   - component: {fileID: 8484009838127864613}
   - component: {fileID: 4355952290911180087}
   m_Layer: 11
-  m_Name: LadderDetect
+  m_Name: InteractableDetect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -344,6 +344,7 @@ MonoBehaviour:
   _playerModel: {fileID: 7655933471050827076}
   _walkSpeed: 5
   _pushPullSpeed: 3
+  _climbSpeed: 3
   _jumpForce: 15
   _hangingJumpBoost: 1.5
   _allowDoubleJump: 0

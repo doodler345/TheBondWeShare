@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
     GroundDetection _groundDetection;
     WallDetection _wallDetection;
     MoveableDetection _moveableDetection;
-    LadderDetection _ladderDetection;
+    InteractableDetection _interactableDetection;
     Coroutine _delayedTearingEnable, _obiKinematicsEnable;
 
     Renderer _renderer;
@@ -44,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
         _groundDetection = GetComponentInChildren<GroundDetection>();
         _wallDetection = GetComponentInChildren<WallDetection>();
         _moveableDetection = GetComponentInChildren<MoveableDetection>();
-        _ladderDetection = GetComponentInChildren<LadderDetection>();
+        _interactableDetection = GetComponentInChildren<InteractableDetection>();
     }
 
     private void Update()
@@ -77,7 +77,7 @@ public class PlayerMovement : MonoBehaviour
 
             case STATE.LADDERCLIMB:
                 LadderClimb(_climbVelocity);
-                if (!_ladderDetection.detected)
+                if (!_interactableDetection.ladderDetected)
                 {
                     _climbVelocity = Vector3.zero;
                     _rb.useGravity = true;
@@ -206,7 +206,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (keyDown)
         {
-            if (_ladderDetection.detected)
+            if (_interactableDetection.ladderDetected)
             {
                 if (State != STATE.LADDERCLIMB)
                 {
@@ -253,6 +253,13 @@ public class PlayerMovement : MonoBehaviour
             else
                 Anchor(keyDown);
         }
+    }
+
+    public void PressButton()
+    {
+        if (!_interactableDetection.buttonDetected) return;
+        
+        _interactableDetection.GetButton().PressButton(); 
     }
 
     public void Anchor(bool setAnchored)
