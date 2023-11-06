@@ -272,7 +272,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a457c9a143780447878ab89805e4609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detected: 0
+  ladderDetected: 0
+  buttonDetected: 0
 --- !u!1 &2612411739907244293
 GameObject:
   m_ObjectHideFlags: 0
@@ -619,7 +620,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _groundLayer:
     serializedVersion: 2
-    m_Bits: 320
+    m_Bits: 832
   _rayLength: 0.25
   _rayOffset: {x: 0.43, y: 0, z: 0}
   grounded: 0
