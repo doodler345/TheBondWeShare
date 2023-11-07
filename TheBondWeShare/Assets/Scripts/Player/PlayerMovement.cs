@@ -54,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
             case STATE.IDLE:
             case STATE.WALK:
                 if (_rb.velocity.y < 0 && !_groundDetection.grounded)
-                    State = STATE.FALL;
+                    ChangeState(STATE.FALL);
                 break;
 
             case STATE.PUSH_OBJECT:
@@ -66,13 +66,13 @@ public class PlayerMovement : MonoBehaviour
             case STATE.JUMP:
                 if (_rb.velocity.y < 0)
                 {
-                    State = STATE.FALL;
+                    ChangeState(STATE.FALL);
                 }
                 break;
 
             case STATE.FALL:
                 if (_groundDetection.grounded)
-                    State = STATE.IDLE;
+                    ChangeState(STATE.IDLE);
                 break;
 
             case STATE.LADDERCLIMB:
@@ -81,7 +81,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     _climbVelocity = Vector3.zero;
                     _rb.useGravity = true;
-                    State = STATE.IDLE;
+                    ChangeState(STATE.IDLE);
                 }
 
                 break;
@@ -104,7 +104,7 @@ public class PlayerMovement : MonoBehaviour
             else LedgeUnhang();
         }
 
-        State = STATE.FALL;
+        ChangeState(STATE.FALL);
     }
 
     public void Move(int xVelocity)
@@ -116,8 +116,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (xVelocity == 0)
         {
-            if (!(State == STATE.JUMP || State == STATE.FALL || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || State == STATE.LADDERCLIMB) && _groundDetection.grounded) 
-                State = STATE.IDLE;
+            if (!(State == STATE.JUMP || State == STATE.FALL || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || State == STATE.LADDERCLIMB) && _groundDetection.grounded)
+                ChangeState(STATE.IDLE);
             return;
         }
         else
@@ -128,7 +128,7 @@ public class PlayerMovement : MonoBehaviour
 
             if (!(State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT) && _wallDetection.facingWall)
             {
-                State = STATE.IDLE;
+                ChangeState(STATE.IDLE);
                 return;
             }
 
@@ -147,7 +147,7 @@ public class PlayerMovement : MonoBehaviour
 
             else
             {
-                State = STATE.WALK;
+                ChangeState(STATE.WALK);
                 speedX *= _walkSpeed;                
             }
 
@@ -166,9 +166,9 @@ public class PlayerMovement : MonoBehaviour
             _moveableDetection.Turn();
 
             if(State == STATE.PULL_OBJECT)
-                State = STATE.PUSH_OBJECT;
+                ChangeState(STATE.PUSH_OBJECT);
             else if (State == STATE.PUSH_OBJECT)
-                State = STATE.PULL_OBJECT;
+                ChangeState(STATE.PULL_OBJECT);
 
             _tmpDirection = directionX;
         }
@@ -179,7 +179,7 @@ public class PlayerMovement : MonoBehaviour
         if (!_groundDetection.grounded && !_doubleJmpPossible && !(State == STATE.HANGING)) return;
         else if (State == STATE.ANCHOR || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT) return;
 
-        State = STATE.JUMP;
+        ChangeState(STATE.JUMP);
 
         if (_wallDetection.hanging)
         {
@@ -212,7 +212,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     _rb.useGravity = false;
                     _rb.velocity = Vector3.zero;
-                    State = STATE.LADDERCLIMB;
+                    ChangeState(STATE.LADDERCLIMB);
                 }
                 if(_climbVelocity.normalized != Vector3.up) _climbVelocity = Vector3.up * _climbSpeed;
             }
@@ -233,7 +233,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (State == STATE.HANGING)
             {
-                State = STATE.FALL;
+                ChangeState(STATE.FALL);
                 LedgeUnhang();
             }
 
@@ -268,7 +268,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (State == STATE.JUMP || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || !_groundDetection.grounded || StageController.instance.isUnbound) return;
 
-            State = STATE.ANCHOR;
+            ChangeState(STATE.ANCHOR);
 
             _rb.isKinematic = true;
 
@@ -280,7 +280,7 @@ public class PlayerMovement : MonoBehaviour
 
         else if (!setAnchored && State == STATE.ANCHOR)
         {
-            State = STATE.IDLE;
+            ChangeState(STATE.IDLE);
 
             _rb.isKinematic = false;
 
@@ -306,13 +306,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (State == STATE.LADDERCLIMB) return;
 
-        State = STATE.HANGING;
+        ChangeState(STATE.HANGING);
 
         _rb.isKinematic = true;
         
         if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
-        _obiKinematicsEnable = StartCoroutine(EnableObiKinematics(true, 0));
-        
+        _obiRB.kinematicForParticles = true;
+
+
     }
     void LedgeUnhang()
     {
@@ -320,6 +321,8 @@ public class PlayerMovement : MonoBehaviour
         _wallDetection.hanging = false;
         
         _rb.isKinematic = false;
+        
+        if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
         _obiKinematicsEnable = StartCoroutine(EnableObiKinematics(false, 0.2f));
     }
     IEnumerator EnableObiKinematics(bool isActive, float delay)
@@ -357,11 +360,35 @@ public class PlayerMovement : MonoBehaviour
         if (_moveableObject.getsMoved) return;
 
         _moveableObject.getsMoved = true;
-        State = STATE.PUSH_OBJECT;
+        ChangeState(STATE.PUSH_OBJECT);
     }
 
 
 
+    private void ChangeState(STATE newState)
+    {
+        if (State == newState) return;
+
+        if (State == STATE.IDLE && State != newState)
+        {
+            if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
+            _obiRB.kinematicForParticles = false;
+            _rb.velocity = Vector3.zero;
+        }
+
+        State = newState;
+
+        switch (State)
+        {
+            case STATE.IDLE:
+                if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
+                _obiRB.kinematicForParticles = true;
+                _rb.velocity = Vector3.zero;
+                break;
+            default:
+                break;
+        }
+    }
 
     public enum STATE
     {
