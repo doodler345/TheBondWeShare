@@ -369,6 +369,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (State == newState) return;
 
+        //changing away from IDLE
         if (State == STATE.IDLE && State != newState)
         {
             if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
