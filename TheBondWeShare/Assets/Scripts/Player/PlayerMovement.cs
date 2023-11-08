@@ -8,6 +8,8 @@ public class PlayerMovement : MonoBehaviour
 {
     public STATE State;
     [SerializeField] RopeController _ropeController;
+    private StageController _stageController;
+
     [SerializeField] Transform _playerModel;
     private MoveableObject _moveableObject;
     private Vector3 _walkVelocity, _climbVelocity;
@@ -47,9 +49,14 @@ public class PlayerMovement : MonoBehaviour
         _interactableDetection = GetComponentInChildren<InteractableDetection>();
     }
 
+    private void Start()
+    {
+        _stageController = StageController.instance;
+    }
+
     private void Update()
     {
-        //Checking for State interruptions
+        //Checking for State Interruptions
         switch (State)
         {
             case STATE.IDLE:
@@ -59,6 +66,12 @@ public class PlayerMovement : MonoBehaviour
                 break;
 
             case STATE.PUSH_OBJECT:
+                if (_rb.velocity.y < 0 && !_groundDetection.grounded)
+                    PushPullObject(false);
+                else if (!_moveableDetection.detected)
+                    PushPullObject(false);
+                break;
+
             case STATE.PULL_OBJECT:
                 if (_rb.velocity.y < 0 && !_groundDetection.grounded)
                     PushPullObject(false);
@@ -83,11 +96,7 @@ public class PlayerMovement : MonoBehaviour
             case STATE.LADDERCLIMB:
                 LadderClimb(_climbVelocity);
                 if (!_interactableDetection.ladderDetected)
-                {
-                    _climbVelocity = Vector3.zero;
-                    _rb.useGravity = true;
                     ChangeState(STATE.IDLE);
-                }
                 break;
 
             case STATE.ROPE_HANGING:
@@ -135,13 +144,25 @@ public class PlayerMovement : MonoBehaviour
 
             CheckForTurn(xVelocity);
 
-            if (!(State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || State == STATE.ROPE_HANGING) && _wallDetection.facingWall)
+            if (_wallDetection.facingWall)
             {
-                ChangeState(STATE.IDLE);
-                return;
+                switch (State)
+                {
+                    case STATE.PUSH_OBJECT:
+                    case STATE.PULL_OBJECT:
+                        break;
+
+                    case STATE.ROPE_HANGING:
+                        ChangeState(STATE.FALL);
+                        break;
+
+                    default:
+                        ChangeState(STATE.IDLE);
+                        return;
+                }
             }
 
-            else if (State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT)
+            if (State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT)
             {
                 speedX *= _pushPullSpeed;
 
@@ -160,8 +181,9 @@ public class PlayerMovement : MonoBehaviour
                 speedX *= _walkSpeed;                
             }
 
-            _walkVelocity = new Vector3(speedX, 0, 0);
             _tmpPosX = transform.position.x;
+
+            _walkVelocity = new Vector3(speedX, 0, 0);
             _rb.MovePosition(transform.position += _walkVelocity * Time.deltaTime);
         }
     }
@@ -186,7 +208,15 @@ public class PlayerMovement : MonoBehaviour
     public void Jump()
     {
         if (!_groundDetection.grounded && !_doubleJmpPossible && !(State == STATE.LEGDE_HANGING)) return;
-        else if (State == STATE.ANCHOR || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || State == STATE.ROPE_HANGING) return;
+
+        switch (State)
+        {
+            case STATE.ANCHOR: 
+            case STATE.PUSH_OBJECT: 
+            case STATE.PULL_OBJECT: 
+            case STATE.ROPE_HANGING:
+                return;
+        }
 
         ChangeState(STATE.JUMP);
 
@@ -218,12 +248,9 @@ public class PlayerMovement : MonoBehaviour
             if (_interactableDetection.ladderDetected)
             {
                 if (State != STATE.LADDERCLIMB)
-                {
-                    _rb.useGravity = false;
-                    _rb.velocity = Vector3.zero;
                     ChangeState(STATE.LADDERCLIMB);
-                }
-                if(_climbVelocity.normalized != Vector3.up) _climbVelocity = Vector3.up * _climbSpeed;
+
+                if (_climbVelocity.normalized != Vector3.up) _climbVelocity = Vector3.up * _climbSpeed;
             }
 
             else
@@ -240,19 +267,20 @@ public class PlayerMovement : MonoBehaviour
     {
         if (keyDown)
         {
-            if (State == STATE.LEGDE_HANGING)
+            switch (State)
             {
-                ChangeState(STATE.FALL);
-                LedgeUnhang();
-            }
+                case STATE.LEGDE_HANGING:
+                    ChangeState(STATE.FALL);
+                    LedgeUnhang();
+                    break;
+                case STATE.LADDERCLIMB:
+                    if (_climbVelocity.normalized != Vector3.down) _climbVelocity = Vector3.down * _climbSpeed;
+                    break;
 
-            else if (State == STATE.LADDERCLIMB)
-            {
-                if (_climbVelocity.normalized != Vector3.down) _climbVelocity = Vector3.down * _climbSpeed;
+                default:
+                    Anchor(keyDown);
+                    break;
             }
-
-            else
-                Anchor(keyDown);
         }
 
         else
@@ -275,7 +303,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (setAnchored)
         {
-            if (State == STATE.JUMP || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || !_groundDetection.grounded || StageController.instance.isUnbound) return;
+            if (State == STATE.JUMP || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || !_groundDetection.grounded || _stageController.isUnbound) return;
 
             ChangeState(STATE.ANCHOR);
 
@@ -306,9 +334,8 @@ public class PlayerMovement : MonoBehaviour
     public void Crane(bool up)
     {
         if (State == STATE.ANCHOR)
-        {
             _ropeController.Crane(up);
-        }
+
     }
 
     public void LedgeHang()
@@ -343,13 +370,13 @@ public class PlayerMovement : MonoBehaviour
 
     public void BoundUnbound()
     {
-        if (StageController.instance.isUnbound)
+        if (_stageController.isUnbound)
         {
-            StageController.instance.ReboundPlayers();
+            _stageController.ReboundPlayers();
         }
         else
         {
-            StageController.instance.UnboundPlayers();
+            _stageController.UnboundPlayers();
         }
     }
 
@@ -357,13 +384,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!isGrabbing && (State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT))
         {
-            State = STATE.IDLE;
-            _moveableObject.getsMoved = false;
-            _moveableObject = null;
+            ChangeState(STATE.IDLE);
             return;
         }
 
         if (!_moveableDetection.detected || !_groundDetection.grounded || (State == STATE.ANCHOR) ) return;
+
         _moveableObject = _moveableDetection.GetDetectedObject();
 
         if (_moveableObject.getsMoved) return;
@@ -406,6 +432,15 @@ public class PlayerMovement : MonoBehaviour
             case STATE.IDLE:
                 if (_ropeController.limitExeeded) ObiKinematicManagement(false);
                 break;
+            case STATE.LADDERCLIMB:
+                _rb.useGravity = true;
+                _rb.velocity = Vector3.zero;
+                break;
+            case STATE.PUSH_OBJECT:
+            case STATE.PULL_OBJECT:
+                _moveableObject.getsMoved = false;
+                _moveableObject = null;
+                break;
             case STATE.ROPE_HANGING:
                 _ropeController.SetMaxPlayerDistance(1);
                 ObiKinematicManagement(true);
@@ -421,6 +456,13 @@ public class PlayerMovement : MonoBehaviour
         {
             case STATE.IDLE:
                 ObiKinematicManagement(true);
+                break;
+            case STATE.LADDERCLIMB:
+                _rb.useGravity = false;
+                _rb.velocity = Vector3.zero;
+                break;
+            case STATE.PUSH_OBJECT:
+                _tmpPosX = transform.position.x;
                 break;
             case STATE.ROPE_HANGING:
                 _ropeController.SetMaxPlayerDistance(2);
