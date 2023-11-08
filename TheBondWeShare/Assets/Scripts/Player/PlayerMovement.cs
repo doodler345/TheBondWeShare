@@ -22,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
     bool _ladderClimb, _ladderClimbUP; //murks
 
     Rigidbody _rb;
-    ObiRigidbody _obiRB;
+    [HideInInspector] public ObiRigidbody obiRB;
 
     GroundDetection _groundDetection;
     WallDetection _wallDetection;
@@ -38,7 +38,7 @@ public class PlayerMovement : MonoBehaviour
     {
         _playerID = GetComponent<PlayerInput>().playerID;
         _rb = GetComponent<Rigidbody>();
-        _obiRB = GetComponent<ObiRigidbody>();
+        obiRB = GetComponent<ObiRigidbody>();
         _renderer = GetComponentInChildren<Renderer>();
         _initColor = _renderer.material.color;
         _groundDetection = GetComponentInChildren<GroundDetection>();
@@ -49,6 +49,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        //Checking for State interruptions
         switch (State)
         {
             case STATE.IDLE:
@@ -72,7 +73,11 @@ public class PlayerMovement : MonoBehaviour
 
             case STATE.FALL:
                 if (_groundDetection.grounded)
+                {
                     ChangeState(STATE.IDLE);
+                }
+                else if (_rb.velocity.y > 0 && !_wallDetection.facingWall)
+                    ChangeState(STATE.ROPE_HANGING);
                 break;
 
             case STATE.LADDERCLIMB:
@@ -83,7 +88,11 @@ public class PlayerMovement : MonoBehaviour
                     _rb.useGravity = true;
                     ChangeState(STATE.IDLE);
                 }
+                break;
 
+            case STATE.ROPE_HANGING:
+                if (_wallDetection.facingWall)
+                    ChangeState(STATE.FALL);
                 break;
 
             default: 
@@ -98,7 +107,7 @@ public class PlayerMovement : MonoBehaviour
             if (_groundDetection.GetPlatformType() == 0) return;
             else Anchor(false);
         }
-        else if (State == STATE.HANGING)
+        else if (State == STATE.LEGDE_HANGING)
         {
             if (_wallDetection.GetLedgePlatformType() == 0) return;
             else LedgeUnhang();
@@ -109,7 +118,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void Move(int xVelocity)
     {
-        if (State == STATE.ANCHOR || State == STATE.HANGING)
+        if (State == STATE.ANCHOR || State == STATE.LEGDE_HANGING)
         {
             return;
         }
@@ -126,7 +135,7 @@ public class PlayerMovement : MonoBehaviour
 
             CheckForTurn(xVelocity);
 
-            if (!(State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT) && _wallDetection.facingWall)
+            if (!(State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || State == STATE.ROPE_HANGING) && _wallDetection.facingWall)
             {
                 ChangeState(STATE.IDLE);
                 return;
@@ -147,7 +156,7 @@ public class PlayerMovement : MonoBehaviour
 
             else
             {
-                ChangeState(STATE.WALK);
+                if(!(State == STATE.ROPE_HANGING)) ChangeState(STATE.WALK);
                 speedX *= _walkSpeed;                
             }
 
@@ -176,8 +185,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void Jump()
     {
-        if (!_groundDetection.grounded && !_doubleJmpPossible && !(State == STATE.HANGING)) return;
-        else if (State == STATE.ANCHOR || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT) return;
+        if (!_groundDetection.grounded && !_doubleJmpPossible && !(State == STATE.LEGDE_HANGING)) return;
+        else if (State == STATE.ANCHOR || State == STATE.PUSH_OBJECT || State == STATE.PULL_OBJECT || State == STATE.ROPE_HANGING) return;
 
         ChangeState(STATE.JUMP);
 
@@ -231,7 +240,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (keyDown)
         {
-            if (State == STATE.HANGING)
+            if (State == STATE.LEGDE_HANGING)
             {
                 ChangeState(STATE.FALL);
                 LedgeUnhang();
@@ -306,12 +315,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (State == STATE.LADDERCLIMB) return;
 
-        ChangeState(STATE.HANGING);
+        ChangeState(STATE.LEGDE_HANGING);
 
         _rb.isKinematic = true;
         
-        if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
-        _obiRB.kinematicForParticles = true;
+        //if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
+        //obiRB.kinematicForParticles = true;
 
 
     }
@@ -322,13 +331,13 @@ public class PlayerMovement : MonoBehaviour
         
         _rb.isKinematic = false;
         
-        if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
-        _obiKinematicsEnable = StartCoroutine(EnableObiKinematics(false, 0.2f));
+        //if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
+        //_obiKinematicsEnable = StartCoroutine(EnableObiKinematics(false, 0.2f));
     }
     IEnumerator EnableObiKinematics(bool isActive, float delay)
     {
         yield return new WaitForSeconds(delay);
-        _obiRB.kinematicForParticles = isActive;
+        obiRB.kinematicForParticles = isActive;
     }
 
 
@@ -364,27 +373,58 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+    public void ObiKinematicManagement(bool isActive)
+    {
+        //check if player is inside maxRadius again and stop him
+        if (isActive && !_ropeController.limitExeeded)
+            _rb.velocity = new Vector3(0, _rb.velocity.y, 0);
+
+        if (State == STATE.ROPE_HANGING)
+        {
+            obiRB.kinematicForParticles = false;
+            return;
+        }
+
+        if (State == STATE.IDLE)
+        {
+            obiRB.kinematicForParticles = true;
+            return;
+        }
+
+
+        obiRB.kinematicForParticles = isActive;
+    }
+
 
     private void ChangeState(STATE newState)
     {
         if (State == newState) return;
 
-        //changing away from IDLE
-        if (State == STATE.IDLE && State != newState)
+        //changing away from a state
+        switch (State)
         {
-            if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
-            _obiRB.kinematicForParticles = false;
-            _rb.velocity = Vector3.zero;
+            case STATE.IDLE:
+                if (_ropeController.limitExeeded) ObiKinematicManagement(false);
+                break;
+            case STATE.ROPE_HANGING:
+                _ropeController.SetMaxPlayerDistance(1);
+                ObiKinematicManagement(true);
+                break;
+            default:
+                break;
         }
 
         State = newState;
 
+        //entering new State
         switch (State)
         {
             case STATE.IDLE:
-                if (_obiKinematicsEnable != null) StopCoroutine(_obiKinematicsEnable);
-                _obiRB.kinematicForParticles = true;
-                _rb.velocity = Vector3.zero;
+                ObiKinematicManagement(true);
+                break;
+            case STATE.ROPE_HANGING:
+                _ropeController.SetMaxPlayerDistance(2);
+                ObiKinematicManagement(false);
                 break;
             default:
                 break;
@@ -396,7 +436,8 @@ public class PlayerMovement : MonoBehaviour
         IDLE,
         WALK,
         JUMP,
-        HANGING,
+        LEGDE_HANGING,
+        ROPE_HANGING,
         FALL,
         ANCHOR,
         PUSH_OBJECT,

@@ -8,9 +8,13 @@ public class StageController : MonoBehaviour
     [SerializeField] VCamController _vCamController;
     [SerializeField] RopeController _ropeController;
     
-    private GameObject _playerSetup, _player1, _player2;
-    [SerializeField] Transform _spawn;
     [SerializeField] GameObject world1, world2;
+    public GameObject _playerSetup, _player1, _player2;
+
+    public Transform playerMid;
+    public Vector2 currentPlayerDistance;
+
+    [SerializeField] Transform _spawn;
 
     Coroutine _ropeIsTearing;
 
@@ -36,9 +40,14 @@ public class StageController : MonoBehaviour
         SpawnPlayers(_spawn.position, true);
     }
 
+    private void Update()
+    {
+        UpdatePlayerMid();
+    }
+
+
     private void SpawnPlayers(Vector3 position, bool isP1Left)
     {
-        Debug.Log(_playerSetupPrefab + " " + position);
         _playerSetup = Instantiate(_playerSetupPrefab, position, Quaternion.identity);
         _ropeController = _playerSetup.GetComponentInChildren<RopeController>();
 
@@ -106,6 +115,18 @@ public class StageController : MonoBehaviour
     private void DestroyPlayers()
     {
         Destroy(_playerSetup);
+    }
+
+
+
+    private void UpdatePlayerMid()
+    {
+        if (_player1 == null) return;
+
+        currentPlayerDistance = _player2.transform.position - _player1.transform.position;
+        Vector2 betweenPlayers = (Vector2)_player1.transform.position + 0.5f * currentPlayerDistance;
+
+        playerMid.position = betweenPlayers;
     }
 
 

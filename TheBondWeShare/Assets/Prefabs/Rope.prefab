@@ -57,7 +57,10 @@ MonoBehaviour:
   _startAttachment: {fileID: 7167979050938898857}
   _endAttachement: {fileID: 798342598170977138}
   _minLength: 2.5
-  _maxLength: 3
+  _maxLength: 3.7
+  _maxPlayerDistance: 3.75
+  _getBackBuffer: 0.5
+  limitExeeded: 0
   _tearingPossible: 0
 --- !u!114 &7198565397509092735
 MonoBehaviour:

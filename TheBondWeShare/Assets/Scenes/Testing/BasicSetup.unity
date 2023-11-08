@@ -330,9 +330,14 @@ MonoBehaviour:
   _playerSetupPrefab: {fileID: 752806480876530873, guid: cdc18c6d84969dc4f94e49702c2203f9, type: 3}
   _vCamController: {fileID: 1951393912}
   _ropeController: {fileID: 0}
-  _spawn: {fileID: 1742080305}
   world1: {fileID: 1473917731}
   world2: {fileID: 207935760}
+  _playerSetup: {fileID: 0}
+  _player1: {fileID: 0}
+  _player2: {fileID: 0}
+  playerMid: {fileID: 590783397}
+  currentPlayerDistance: {x: 0, y: 0}
+  _spawn: {fileID: 1742080305}
   _maxReboundDistance: 2
   isUnbound: 0
 --- !u!4 &504127435
@@ -1246,7 +1251,7 @@ Transform:
   m_GameObject: {fileID: 1742080304}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.06, y: 5.41, z: 0}
+  m_LocalPosition: {x: -0.06, y: 6.36, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1266,7 +1271,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 492393605536618171, guid: b33702cc98edb3041b7efec75767c713, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.47
+      value: 4.35
       objectReference: {fileID: 0}
     - target: {fileID: 492393605536618171, guid: b33702cc98edb3041b7efec75767c713, type: 3}
       propertyPath: m_LocalPosition.z

@@ -7,6 +7,17 @@ public class RopeController : MonoBehaviour
 {
     [SerializeField] ObiParticleAttachment _startAttachment, _endAttachement;
     [SerializeField] float _minLength = 2.0f, _maxLength = 5.0f;
+
+    [SerializeField] float _maxPlayerDistance = 2f; 
+    private float _initMaxDistance;
+    [SerializeField] float _getBackBuffer = 5f;
+    private float _ropeOffsetZ;
+    private Transform _playerMid;
+    public bool limitExeeded;
+    StageController _stageController;
+    PlayerMovement _p1, _p2;
+
+
     [SerializeField] bool _tearingPossible;
     ObiRopeCursor _cursor;
     ObiRope _rope;
@@ -16,11 +27,56 @@ public class RopeController : MonoBehaviour
     {
         _cursor = GetComponent<ObiRopeCursor>();
         _rope = GetComponent<ObiRope>();
+        _playerMid = StageController.instance.playerMid;
+        _ropeOffsetZ = transform.localPosition.z;
+        _initMaxDistance = _maxPlayerDistance;
     }
 
     private void Start()
     {
+        _stageController = StageController.instance;
+        _p1 = _stageController._player1.GetComponent<PlayerMovement>();
+        _p2 = _stageController._player2.GetComponent<PlayerMovement>();
+
         ResetLength();
+    }
+
+    private void Update()
+    {
+        CheckPlayerDistance();
+    }
+
+    private void CheckPlayerDistance()
+    {
+        float playerDistSqr = StageController.instance.currentPlayerDistance.sqrMagnitude;
+        if (playerDistSqr >= (_maxPlayerDistance * _maxPlayerDistance) && !limitExeeded)
+        {
+            limitExeeded = true;
+
+            _p1.ObiKinematicManagement(false);
+            _p2.ObiKinematicManagement(false);            
+
+        }
+        else if (limitExeeded)
+
+        {
+            if (playerDistSqr < (_maxPlayerDistance * _maxPlayerDistance) - _getBackBuffer)
+            {
+                limitExeeded = false;
+                _p1.ObiKinematicManagement(true);
+                _p2.ObiKinematicManagement(true);
+            }
+            else
+            {
+                _p1.ObiKinematicManagement(false);
+                _p2.ObiKinematicManagement(false);
+            }
+        }
+    }
+
+    public void SetMaxPlayerDistance(int multiply)
+    {
+        _maxPlayerDistance = _initMaxDistance * multiply;
     }
 
     public void StaticDynamicSwitch(bool isStatic, int playerID)
@@ -99,5 +155,10 @@ public class RopeController : MonoBehaviour
         yield return new WaitForSeconds(timeTillDisappear);
 
         Destroy(this.gameObject);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if(_playerMid) Gizmos.DrawWireSphere(_playerMid.position + new Vector3 (0,0,_ropeOffsetZ), _maxPlayerDistance / 2);
     }
 }
